@@ -62,6 +62,12 @@ from authentik.policies.engine import PolicyEngine
 LOGGER = get_logger()
 # Argument used to redirect user after login
 NEXT_ARG_NAME = "next"
+
+
+class FlowTokenExpiredError(SentryIgnoredException):
+    """Error raised when a flow token has expired"""
+
+
 SESSION_KEY_PLAN = "authentik/flows/plan"
 SESSION_KEY_GET = "authentik/flows/get"
 SESSION_KEY_POST = "authentik/flows/post"
@@ -136,6 +142,12 @@ class FlowExecutorView(APIView):
         """Check if the user is using a flow token to restore a plan"""
         token: FlowToken | None = FlowToken.objects.filter(key=key).first()
         if not token:
+            # Check if the token exists but is expired
+            expired_token = FlowToken.objects.including_expired().filter(key=key).first()
+            if expired_token:
+                self._logger.info("f(exec): Flow token has expired", token=expired_token)
+                expired_token.delete()
+                raise FlowTokenExpiredError()
             return None
         plan = None
         try:
@@ -158,7 +170,17 @@ class FlowExecutorView(APIView):
             span.set_data("authentik Flow", self.flow.slug)
             get_params = QueryDict(request.GET.get(QS_QUERY, ""))
             if QS_KEY_TOKEN in get_params:
-                plan = self._check_flow_token(get_params[QS_KEY_TOKEN])
+                try:
+                    plan = self._check_flow_token(get_params[QS_KEY_TOKEN])
+                except FlowTokenExpiredError:
+                    return to_stage_response(
+                        self.request,
+                        self.stage_invalid(
+                            error_message=_(
+                                "This link has expired. Please request a new one."
+                            )
+                        ),
+                    )
                 if plan:
                     self.request.session[SESSION_KEY_PLAN] = plan
             # Early check if there's an active Plan for the current session
