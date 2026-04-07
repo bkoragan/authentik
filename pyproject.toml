@@ -275,6 +275,8 @@ omit = [
   "*/migrations/*",
   "*/management/commands/*",
   "*/apps.py",
+  "*/tests/*",
+  "*/test_*.py",
   # TODO: Remove this after moving website to docs
   "website/",
   "docs/",
