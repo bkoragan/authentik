@@ -1,8 +1,8 @@
 """Tests for django-dramatiq-postgres broker fixes related to empty/corrupt message payloads and requeue behavior. Issue #21410"""
 
 from django.test import TestCase
-from dramatiq import Message, actor, get_broker
 from django_dramatiq_postgres.models import TaskState
+from dramatiq import Message, actor, get_broker
 
 from authentik.tasks.models import Task
 
