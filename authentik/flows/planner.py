@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from django.core.cache import cache
 from django.http import HttpRequest, HttpResponse
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 from sentry_sdk import start_span
 from sentry_sdk.tracing import Span
 from structlog.stdlib import BoundLogger, get_logger
