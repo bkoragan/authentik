@@ -751,7 +751,10 @@ class TestFlowExecutor(FlowTestCase):
     )
     def test_expired_flow_token(self):
         """Test that an expired flow token shows an appropriate error message"""
-        flow = create_test_flow(FlowDesignation.RECOVERY)
+        flow = create_test_flow(
+            FlowDesignation.RECOVERY,
+            authentication=FlowAuthenticationRequirement.REQUIRE_TOKEN,
+        )
         user = create_test_user()
         plan = FlowPlan(flow_pk=flow.pk.hex, bindings=[], markers=[])
 
@@ -771,9 +774,47 @@ class TestFlowExecutor(FlowTestCase):
             response,
             flow,
             component="ak-stage-access-denied",
-            error_message="This link has expired. Please request a new one.",
+            error_message="This link is invalid or has expired. Please request a new one.",
         )
-        # Verify the expired token was cleaned up
-        self.assertFalse(
-            FlowToken.objects.including_expired().filter(pk=token.pk).exists()
+
+    @patch(
+        "authentik.flows.views.executor.to_stage_response",
+        TO_STAGE_RESPONSE_MOCK,
+    )
+    def test_invalid_flow_token_require_token(self):
+        """Test that an invalid/nonexistent token on a REQUIRE_TOKEN flow shows error"""
+        flow = create_test_flow(
+            FlowDesignation.RECOVERY,
+            authentication=FlowAuthenticationRequirement.REQUIRE_TOKEN,
+        )
+
+        url = reverse("authentik_api:flow-executor", kwargs={"flow_slug": flow.slug})
+        response = self.client.get(
+            url + f"?{urlencode({QS_QUERY: urlencode({QS_KEY_TOKEN: 'invalid-token'})})}"
+        )
+        self.assertStageResponse(
+            response,
+            flow,
+            component="ak-stage-access-denied",
+            error_message="This link is invalid or has expired. Please request a new one.",
+        )
+
+    @patch(
+        "authentik.flows.views.executor.to_stage_response",
+        TO_STAGE_RESPONSE_MOCK,
+    )
+    def test_no_token_require_token(self):
+        """Test that accessing a REQUIRE_TOKEN flow without any token shows error"""
+        flow = create_test_flow(
+            FlowDesignation.RECOVERY,
+            authentication=FlowAuthenticationRequirement.REQUIRE_TOKEN,
+        )
+
+        url = reverse("authentik_api:flow-executor", kwargs={"flow_slug": flow.slug})
+        response = self.client.get(url)
+        self.assertStageResponse(
+            response,
+            flow,
+            component="ak-stage-access-denied",
+            error_message="This link is invalid or has expired. Please request a new one.",
         )

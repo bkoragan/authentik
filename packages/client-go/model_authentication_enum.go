@@ -27,6 +27,7 @@ const (
 	AUTHENTICATIONENUM_REQUIRE_SUPERUSER       AuthenticationEnum = "require_superuser"
 	AUTHENTICATIONENUM_REQUIRE_REDIRECT        AuthenticationEnum = "require_redirect"
 	AUTHENTICATIONENUM_REQUIRE_OUTPOST         AuthenticationEnum = "require_outpost"
+	AUTHENTICATIONENUM_REQUIRE_TOKEN           AuthenticationEnum = "require_token"
 )
 
 // All allowed values of AuthenticationEnum enum
@@ -37,6 +38,7 @@ var AllowedAuthenticationEnumEnumValues = []AuthenticationEnum{
 	"require_superuser",
 	"require_redirect",
 	"require_outpost",
+	"require_token",
 }
 
 func (v *AuthenticationEnum) UnmarshalJSON(src []byte) error {

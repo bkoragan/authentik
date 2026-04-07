@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 
 from django.core.cache import cache
 from django.http import HttpRequest, HttpResponse
+from django.utils.translation import gettext_lazy as _
 from sentry_sdk import start_span
 from sentry_sdk.tracing import Span
 from structlog.stdlib import BoundLogger, get_logger
@@ -26,6 +27,7 @@ from authentik.lib.config import CONFIG
 from authentik.lib.utils.urls import redirect_with_qs
 from authentik.outposts.models import Outpost
 from authentik.policies.engine import PolicyEngine
+from authentik.policies.types import PolicyResult
 from authentik.root.middleware import ClientIPMiddleware
 
 if TYPE_CHECKING:
@@ -226,6 +228,15 @@ class FlowPlanner:
             and context.get(PLAN_CONTEXT_IS_REDIRECTED) is None
         ):
             raise FlowNonApplicableException()
+        if (
+            self.flow.authentication == FlowAuthenticationRequirement.REQUIRE_TOKEN
+            and context.get(PLAN_CONTEXT_IS_RESTORED) is None
+        ):
+            exc = FlowNonApplicableException()
+            exc.policy_result = PolicyResult(
+                False, _("This link is invalid or has expired. Please request a new one.")
+            )
+            raise exc
         outpost_user = ClientIPMiddleware.get_outpost_user(request)
         if self.flow.authentication == FlowAuthenticationRequirement.REQUIRE_OUTPOST:
             if not outpost_user:
