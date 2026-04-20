@@ -370,6 +370,14 @@ class _PostgresConsumer(Consumer):
         )
         if task is None:
             return None
+        if not task.message:
+            self.logger.warning(
+                "Message has empty payload, deleting",
+                message_id=message_id,
+            )
+            self.query_set.filter(message_id=message_id).delete()
+            self._unlock_message(message_id)
+            return None
         message = Message.decode(cast(bytes, task.message))
         message.options["task"] = task
         self.in_processing.add(str(message_id))
@@ -476,12 +484,13 @@ class _PostgresConsumer(Consumer):
 
     @raise_connection_error
     def requeue(self, messages: Iterable[Message[Any]]) -> None:
-        self.query_set.filter(
-            message_id__in=[message.message_id for message in messages],
-        ).update(
-            state=TaskState.QUEUED,
-        )
         for message in messages:
+            self.query_set.filter(
+                message_id=message.message_id,
+            ).update(
+                state=TaskState.QUEUED,
+                message=message.encode(),
+            )
             self.to_unlock.add(str(message.message_id))
             self.in_processing.remove(str(message.message_id))
 
