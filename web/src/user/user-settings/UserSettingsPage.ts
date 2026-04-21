@@ -140,6 +140,7 @@ export class UserSettingsPage extends WithSession(AKElement) {
                         <div class="pf-l-stack pf-m-gutter">
                             <div class="pf-l-stack__item">
                                 <div class="pf-c-card">
+                                    <div class="pf-c-card__title">${msg("MFA Devices")}</div>
                                     <ak-user-settings-mfa
                                         .userSettings=${this.userSettings}
                                     ></ak-user-settings-mfa>
@@ -147,6 +148,9 @@ export class UserSettingsPage extends WithSession(AKElement) {
                             </div>
                             <div class="pf-l-stack__item">
                                 <div class="pf-c-card">
+                                    <div class="pf-c-card__title">
+                                        ${msg("Tokens and App passwords")}
+                                    </div>
                                     <ak-user-token-list></ak-user-token-list>
                                 </div>
                             </div>
