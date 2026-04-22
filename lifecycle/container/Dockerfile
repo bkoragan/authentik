@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Stage 1: Build webui
-FROM --platform=${BUILDPLATFORM} docker.io/library/node:24-trixie-slim@sha256:45babd1b4ce0349fb12c4e24bf017b90b96d52806db32e001e3013f341bef0fe AS node-builder
+FROM --platform=${BUILDPLATFORM} docker.io/library/node:24-trixie-slim@sha256:a31ca31cb79fe52f77a56aed35d03586e41beffc886e59d80d4a1fd0dbb92dab AS node-builder
 
 ARG GIT_BUILD_HASH
 ENV GIT_BUILD_HASH=$GIT_BUILD_HASH
@@ -29,7 +29,7 @@ RUN npm run build && \
     npm run build:sfe
 
 # Stage 2: Build go proxy
-FROM --platform=${BUILDPLATFORM} docker.io/library/golang:1.26.1-trixie@sha256:96b28783b99bcd265fbfe0b36a3ac6462416ce6bf1feac85d4c4ff533cbaa473 AS go-builder
+FROM --platform=${BUILDPLATFORM} docker.io/library/golang:1.26.2-trixie@sha256:c0074c718b473f3827043f86532c4c0ff537e3fe7a81b8219b0d1ccfcc2c9a09 AS go-builder
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -80,7 +80,7 @@ RUN --mount=type=secret,id=GEOIPUPDATE_ACCOUNT_ID \
     /bin/sh -c "GEOIPUPDATE_LICENSE_KEY_FILE=/run/secrets/GEOIPUPDATE_LICENSE_KEY /usr/bin/entry.sh || echo 'Failed to get GeoIP database, disabling'; exit 0"
 
 # Stage 4: Download uv
-FROM ghcr.io/astral-sh/uv:0.11.3@sha256:90bbb3c16635e9627f49eec6539f956d70746c409209041800a0280b93152823 AS uv
+FROM ghcr.io/astral-sh/uv:0.11.5@sha256:555ac94f9a22e656fc5f2ce5dfee13b04e94d099e46bb8dd3a73ec7263f2e484 AS uv
 # Stage 5: Base python image
 FROM ghcr.io/goauthentik/fips-python:3.14.3-slim-trixie-fips@sha256:bf45eb77a010d76fe6abd7ae137d1b0c44b6227cd984945042135fdf05ebf8d9 AS python-base
 
@@ -155,7 +155,6 @@ LABEL org.opencontainers.image.authors="Authentik Security Inc." \
     org.opencontainers.image.documentation="https://docs.goauthentik.io" \
     org.opencontainers.image.licenses="https://github.com/goauthentik/authentik/blob/main/LICENSE" \
     org.opencontainers.image.revision=${GIT_BUILD_HASH} \
-    org.opencontainers.image.source="https://github.com/goauthentik/authentik" \
     org.opencontainers.image.title="authentik server image" \
     org.opencontainers.image.url="https://goauthentik.io" \
     org.opencontainers.image.vendor="Authentik Security Inc." \

@@ -232,11 +232,11 @@ class FlowPlanner:
             self.flow.authentication == FlowAuthenticationRequirement.REQUIRE_TOKEN
             and context.get(PLAN_CONTEXT_IS_RESTORED) is None
         ):
-            exc = FlowNonApplicableException()
-            exc.policy_result = PolicyResult(
-                False, _("This link is invalid or has expired. Please request a new one.")
+            raise FlowNonApplicableException(
+                PolicyResult(
+                    False, _("This link is invalid or has expired. Please request a new one.")
+                )
             )
-            raise exc
         outpost_user = ClientIPMiddleware.get_outpost_user(request)
         if self.flow.authentication == FlowAuthenticationRequirement.REQUIRE_OUTPOST:
             if not outpost_user:
@@ -284,9 +284,7 @@ class FlowPlanner:
             engine.build()
             result = engine.result
             if not result.passing:
-                exc = FlowNonApplicableException()
-                exc.policy_result = result
-                raise exc
+                raise FlowNonApplicableException(result)
             # User is passing so far, check if we have a cached plan
             cached_plan_key = cache_key(self.flow, user)
             cached_plan = cache.get(cached_plan_key, None)

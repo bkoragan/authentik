@@ -63,7 +63,6 @@ LOGGER = get_logger()
 # Argument used to redirect user after login
 NEXT_ARG_NAME = "next"
 
-
 SESSION_KEY_PLAN = "authentik/flows/plan"
 SESSION_KEY_GET = "authentik/flows/get"
 SESSION_KEY_POST = "authentik/flows/post"

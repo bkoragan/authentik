@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-07 00:19+0000\n"
+"POT-Creation-Date: 2026-04-22 00:20+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -730,6 +730,14 @@ msgstr ""
 
 #: authentik/endpoints/connectors/agent/models.py
 msgid "Apple Nonces"
+msgstr ""
+
+#: authentik/endpoints/connectors/agent/models.py
+msgid "Apple Independent Secure Enclave"
+msgstr ""
+
+#: authentik/endpoints/connectors/agent/models.py
+msgid "Apple Independent Secure Enclaves"
 msgstr ""
 
 #: authentik/endpoints/facts.py
@@ -2033,6 +2041,14 @@ msgid "Regular Expression URL matching"
 msgstr ""
 
 #: authentik/providers/oauth2/models.py
+msgid "Authorization"
+msgstr ""
+
+#: authentik/providers/oauth2/models.py
+msgid "Logout"
+msgstr ""
+
+#: authentik/providers/oauth2/models.py
 msgid "Back-channel"
 msgstr ""
 
@@ -2955,7 +2971,7 @@ msgid ""
 "                "
 msgstr ""
 
-#: authentik/sources/ldap/api.py
+#: authentik/sources/ldap/api/sources.py
 msgid "Only a single LDAP Source with password synchronization is allowed"
 msgstr ""
 

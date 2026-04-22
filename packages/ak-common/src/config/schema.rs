@@ -1,5 +1,6 @@
 use std::{collections::HashMap, net::SocketAddr, num::NonZeroUsize};
 
+use ipnet::IpNet;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -22,6 +23,11 @@ pub struct Config {
     pub web: WebConfig,
 
     pub worker: WorkerConfig,
+
+    // Outpost specific fields
+    pub host: Option<String>,
+    pub token: Option<String>,
+    pub insecure: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -48,6 +54,7 @@ pub struct ListenConfig {
     pub http: Vec<SocketAddr>,
     pub metrics: Vec<SocketAddr>,
     pub debug_tokio: SocketAddr,
+    pub trusted_proxy_cidrs: Vec<IpNet>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
